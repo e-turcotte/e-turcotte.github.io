@@ -1,0 +1,313 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial scale = 1">
+    <title>sanke</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://static.codehs.com/gulp/8b576a9f64c9b3cdefffdbb13f45a4481f7be320/chs-js-lib/chs.js"></script>
+
+
+    <style>
+        body {
+            background-image: url("man.jpg");
+            background-repeat: no-repeat;
+            background-position: bottom-center;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        header {
+            text-align: center;
+            font-family: Constantia;
+            color: fuchsia;
+        }
+
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            width: 50%;
+        }
+    </style>
+
+</head>
+
+    <body>
+        <header>
+            <h1 style="font-size:3vw">My Snake Project</h1>
+            <h2 style="font-size:1vw">10/19/20 - 10/20/20</h2>
+            <h2 style="font-size:1vw">Javascript</h2>
+        </header>
+
+        <canvas width="800" height="500" class="codehs-editor-canvas"></canvas>
+        <pre id="console"></pre>
+
+        <script>
+            window.onload = function () {
+
+                var x;
+                var y;
+                var snakeHead;
+                var snakeBody;
+                var direction;
+                var grid;
+                var GRID_SIZE;
+                var snakeLength;
+
+                var borderColor = Color.BLUE;
+                var snakeColor = Color.GREEN;
+                var backgroundColor = Color.BLACK;
+                var appleColor = Color.RED;
+
+                var GAME = true;
+                var GAMEMODE;
+                var speed;
+                var growthRate;
+                var score;
+                var scoreCounter;
+
+                var canTurn;
+
+                function start() {
+                    keyDownMethod(moveHandler);
+                    difficultySelect();
+                }
+
+                function difficultySelect(){
+                    if(confirm("Would you like to play Competitive Mode?")){
+                        GAMEMODE = 0;
+                        speed = 35;
+                        growthRate = 3;
+                    } else {
+                        GAMEMODE = 1;
+                        speed = parseInt(prompt("What speed would you like? (normal is 35)", "35"));
+                        growthRate = parseInt(prompt("How much would you like the snake to grow per apple? (normal is 3)", "3"));
+                    }
+                    gameStart();
+                }
+
+                function gameStart() {
+                    x = 4;
+                    y = 4;
+                    snakeHead = [x, y];
+                    snakeBody = [];
+                    direction = 0;
+                    grid = [];
+                    GRID_SIZE = 10;
+                    snakeLength = 0;
+                    canTurn = true;
+                    score = 1;
+
+                    createGrid();
+                    setTimer(move, speed);
+                    appleSpawner();
+
+                    scoreCounter = new Text("1", "30pt Arial");
+                    scoreCounter.setPosition(10, getHeight() - 10);
+                    scoreCounter.setColor(Color.WHITE);
+                    add(scoreCounter);
+                }
+
+                function createGrid() {
+                    var numCols = parseInt(getWidth() / GRID_SIZE);
+                    var numRows = parseInt(getHeight() / GRID_SIZE);
+                    var borderXSize = parseInt(getWidth() % GRID_SIZE) / 2;
+                    var borderYSize = parseInt(getHeight() % GRID_SIZE) / 2;
+                    if (borderXSize == 0) { borderXSize += GRID_SIZE / 2; numCols--; }
+                    if (borderYSize == 0) { borderYSize += GRID_SIZE / 2; numRows--; }
+
+                    var background = new Rectangle(getWidth(), getHeight());
+                    background.setPosition(0, 0);
+                    background.setColor(backgroundColor);
+                    add(background);
+
+                    createBorder(borderXSize, borderYSize);
+
+                    var gridTemp = [];
+
+                    for (var i = 0; i < numCols; i++) {
+                        for (var j = 0; j < numRows; j++) {
+                            gridTemp[j] = new Rectangle(GRID_SIZE, GRID_SIZE);
+                            gridTemp[j].setPosition(GRID_SIZE * i + borderXSize, GRID_SIZE * j + borderYSize);
+                            gridTemp[j].setColor(backgroundColor);
+                        }
+                        grid[i] = gridTemp;
+                        gridTemp = [];
+                    }
+                }
+
+                function createBorder(borderXSize, borderYSize) {
+                    var borderLeft = new Rectangle(borderXSize, getHeight());
+                    borderLeft.setPosition(0, 0);
+                    borderLeft.setColor(borderColor);
+                    add(borderLeft);
+
+                    var borderRight = new Rectangle(borderXSize, getHeight());
+                    borderRight.setPosition(getWidth() - borderXSize, 0);
+                    borderRight.setColor(borderColor);
+                    add(borderRight);
+
+                    var borderTop = new Rectangle(getWidth(), borderYSize);
+                    borderTop.setPosition(0, 0);
+                    borderTop.setColor(borderColor);
+                    add(borderTop);
+
+                    var borderBottom = new Rectangle(getWidth(), borderYSize);
+                    borderBottom.setPosition(0, getHeight() - borderYSize);
+                    borderBottom.setColor(borderColor);
+                    add(borderBottom);
+                }
+
+                function move() {
+                    switch (direction) {
+                        case 0:
+                            x++;
+                            break;
+                        case 1:
+                            y++;
+                            break;
+                        case 2:
+                            x--;
+                            break;
+                        case 3:
+                            y--;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    snakeBody.unshift(snakeHead);
+                    snakeHead = [x, y];
+                    if (x < 0 || x >= grid.length || y < 0 || y >= grid[x].length) {
+                        gameOver();
+                    } else if (grid[x][y].getColor() == snakeColor) {
+                        gameOver();
+                    } else {
+                        if (grid[x][y].getColor() == appleColor) {
+                            grow();
+                            appleSpawner();
+                        }
+                        grid[x][y].setColor(snakeColor);
+                        add(grid[x][y]);
+                        grid[snakeBody[snakeLength][0]][snakeBody[snakeLength][1]].setColor(backgroundColor);
+                        remove(grid[snakeBody[snakeLength][0]][snakeBody[snakeLength][1]]);
+                    }
+
+                    canTurn = true;
+                }
+
+                function moveHandler(e) {
+                    switch (e.keyCode) {
+                        case Keyboard.RIGHT:
+                            if ((direction != 2 || snakeLength == 0) && canTurn) {
+                                direction = 0;
+                                canTurn = false;
+                            }
+                            break;
+                        case Keyboard.DOWN:
+                            if ((direction != 3 || snakeLength == 0) && canTurn) {
+                                direction = 1;
+                                canTurn = false;
+                            }
+                            break;
+                        case Keyboard.LEFT:
+                            if ((direction != 0 || snakeLength == 0) && canTurn) {
+                                direction = 2;
+                                canTurn = false;
+                            }
+                            break;
+                        case Keyboard.UP:
+                            if ((direction != 1 || snakeLength == 0) && canTurn) {
+                                direction = 3;
+                                canTurn = false;
+                            }
+                            break;
+                        case Keyboard.letter('D'):
+                            if ((direction != 2 || snakeLength == 0) && canTurn) {
+                                direction = 0;
+                                canTurn = false;
+                            }
+                            break;
+                        case Keyboard.letter('S'):
+                            if ((direction != 3 || snakeLength == 0) && canTurn) {
+                                direction = 1;
+                                canTurn = false;
+                            }
+                            break;
+                        case Keyboard.letter('A'):
+                            if ((direction != 0 || snakeLength == 0) && canTurn) {
+                                direction = 2;
+                                canTurn = false;
+                            }
+                            break;
+                        case Keyboard.letter('W'):
+                            if ((direction != 1 || snakeLength == 0) && canTurn) {
+                                direction = 3;
+                                canTurn = false;
+                            }
+                            break;
+                        case Keyboard.SPACE:
+                            if (!GAME){
+                                GAME = true;
+                                gameStart();
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                function grow() {
+                    for (var i = 0; i < growthRate; i++) {
+                        snakeLength++;
+                        score++;
+                        snakeBody[snakeLength] = snakeBody[snakeLength - 1];
+                        scoreCounter.setText(score);
+                    }
+                }
+
+                function appleSpawner() {
+                    var appleX;
+                    var appleY;
+
+                    do {
+                        appleX = Randomizer.nextInt(0, grid.length - 1);
+                        appleY = Randomizer.nextInt(0, grid[appleX].length - 1);
+                    } while (grid[appleX][appleY].getColor == snakeColor)
+
+                    grid[appleX][appleY].setColor(appleColor);
+                    add(grid[appleX][appleY]);
+                }
+
+                function gameOver() {
+                    stopTimer(move);
+                    GAME = false;
+
+                    var txt = new Text("GAME OVER", "49pt Arial");
+                    txt.setPosition(getWidth() / 4 + 2, getHeight() * 2 / 5);
+                    txt.setColor(Color.WHITE);
+                    add(txt);
+
+                    var txt2 = new Text("You grew to a length of " + score + "!", "20pt Arial");
+                    txt2.setPosition(txt.getX() + 45, txt.getY() + 30);
+                    txt2.setColor(Color.WHITE);
+                    add(txt2);
+                }
+
+                if (typeof start === 'function') {
+                    start();
+                }
+            };
+        </script>
+
+    </body>
+</html>

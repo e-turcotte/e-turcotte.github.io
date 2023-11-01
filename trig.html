@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial scale = 1">
+    <title>trangles</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://static.codehs.com/gulp/8b576a9f64c9b3cdefffdbb13f45a4481f7be320/chs-js-lib/chs.js"></script>
+
+
+    <style>
+        body {
+            background-image: url("man.jpg");
+            background-repeat: no-repeat;
+            background-position: bottom-center;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        header {
+            text-align: center;
+            font-family: Constantia;
+            color: fuchsia;
+        }
+
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: center;
+            width: 50%;
+        }
+    </style>
+
+</head>
+
+    <body>
+        <header>
+            <h1 style="font-size:3vw">My Trigonometry Project</h1>
+            <h2 style="font-size:1vw">1/25/21 - 1/31/21</h2>
+            <h2 style="font-size:1vw">Javascript</h2>
+        </header>
+
+        <canvas width="800" height="500" class="codehs-editor-canvas"></canvas>
+        <pre id="console"></pre>
+
+        <script>
+            window.onload = function () {
+
+                var unitCircle;
+                var circle2;
+                var yAxis;
+                var xAxis;
+
+                var angle;
+                var leadingAngle;
+                var angleValue;
+                var angleIntersect;
+
+                var sin;
+                var cos;
+
+                var sinTheta;
+                var cosTheta;
+                var tanTheta;
+                var cscTheta;
+                var secTheta;
+                var cotTheta;
+
+                var angleText;
+                var sinText;
+                var cosText;
+                var tanText;
+                var cscText;
+                var secText;
+                var cotText;
+				
+				var scalar = 800 / ($(window).width()/2);
+
+                function start(){
+                    drawGraph();
+                    mouseDragMethod(angle);
+                }
+
+                function drawGraph(){
+                    var background = new Rectangle(getWidth(),getHeight());
+                    background.setPosition(0,0);
+                    background.setColor('#696969');
+                    add(background);
+                    
+                    unitCircle = new Circle(100);
+                    unitCircle.setPosition(getWidth()/2,getHeight()/2);
+                    unitCircle.setColor("000000");
+                    add(unitCircle);
+                    
+                    circle2 = new Circle(unitCircle.getRadius()-2);
+                    circle2.setPosition(unitCircle.getX(),unitCircle.getY());
+                    circle2.setColor("#FFFFFF");
+                    add(circle2);
+                    
+                    yAxis = new Line(getWidth()/2,0,getWidth()/2,getHeight());
+                    yAxis.setColor("#000000");
+                    add(yAxis);
+                    
+                    xAxis = new Line(0,getHeight(0)/2,getWidth(),getHeight()/2);
+                    xAxis.setColor("#000000");
+                    add(xAxis);
+                    
+                    leadingAngle = new Line(unitCircle.getX(),unitCircle.getY(),unitCircle.getX()+unitCircle.getRadius(),unitCircle.getY());
+                    leadingAngle.setColor("#000000");
+                    add(leadingAngle);
+                    
+                    angleIntersect = new Circle(unitCircle.getRadius()/32);
+                    angleIntersect.setPosition(unitCircle.getX()+unitCircle.getRadius(),unitCircle.getY());
+                    angleIntersect.setColor("#000000");
+                    add(angleIntersect);
+                    
+                    sinTheta = new Line(0,0,0,0);
+                    sinTheta.setColor("#FF0000");
+                    add(sinTheta);
+                    cosTheta = new Line(0,0,0,0);
+                    cosTheta.setColor("#0000FF");
+                    add(cosTheta);
+                    secTheta = new Line(0,0,0,0);
+                    secTheta.setColor("#00FF00");
+                    add(secTheta);
+                    cscTheta = new Line(0,0,0,0);
+                    cscTheta.setColor("#FF00FF");
+                    add(cscTheta);
+                    tanTheta = new Line(0,0,0,0);
+                    tanTheta.setColor("#FFFF00");
+                    add(tanTheta);
+                    cotTheta = new Line(0,0,0,0);
+                    cotTheta.setColor("#00FFFF");
+                    add(cotTheta);
+                    
+                    angleText = new Text("Angle = ", "1vw Helvetica");
+                    angleText.setPosition(0,getHeight()*0.75);
+                    angleText.setColor('#000000');
+                    add(angleText);
+                    sinText = new Text("sin\u03B8 = ", "1vw Helvetica");
+                    sinText.setPosition(0,getHeight()*0.79);
+                    sinText.setColor('#FF0000');
+                    add(sinText);
+                    cosText = new Text("cos\u03B8 = ", "1vw Helvetica");
+                    cosText.setPosition(0,getHeight()*0.83);
+                    cosText.setColor('#0000FF');
+                    add(cosText);
+                    tanText = new Text("tan\u03B8 = ", "1vw Helvetica");
+                    tanText.setPosition(0,getHeight()*0.87);
+                    tanText.setColor('#FFFF00');
+                    add(tanText);
+                    cscText = new Text("csc\u03B8 = ", "1vw Helvetica");
+                    cscText.setPosition(0,getHeight()*0.91);
+                    cscText.setColor('#FF00FF');
+                    add(cscText);
+                    secText = new Text("sec\u03B8 = ", "1vw Helvetica");
+                    secText.setPosition(0,getHeight()*0.95);
+                    secText.setColor('#00FF00');
+                    add(secText);
+                    cotText = new Text("cot\u03B8 = ", "1vw Helvetica");
+                    cotText.setPosition(0,getHeight()*0.99);
+                    cotText.setColor('#00FFFF');
+                    add(cotText);
+                }
+
+                function angle(e){
+                    var realMouseX = e.getX()*scalar;
+                    var realMouseY = e.getY()*scalar;
+
+                    var xdist = realMouseX - unitCircle.getX();
+                    var ydist = -(realMouseY - unitCircle.getY());
+                    var tdist = Math.sqrt(Math.pow(xdist,2) + Math.pow(ydist,2));
+                    
+                    var angleValueSin = Math.asin(ydist/tdist);
+                    var angleValueCos = Math.acos(xdist/tdist);
+                    
+                    angleValue = (angleValueSin/Math.abs(angleValueSin)) * angleValueCos;
+                    
+                    
+                    remove(angle);
+                    angle = new Arc(unitCircle.getRadius()/8,0,angleValue,1);
+                    angle.setPosition(unitCircle.getX(),unitCircle.getY());
+                    angle.setColor("#000000");
+                    add(angle);
+                    
+                    sin = -Math.sin(angleValue)*unitCircle.getRadius() + unitCircle.getY();
+                    cos = Math.cos(angleValue)*unitCircle.getRadius() + unitCircle.getX();
+                    
+                    leadingAngle.setEndpoint(cos,sin);
+                    angleIntersect.setPosition(cos,sin);
+                    
+                    drawIdentities();
+                    values();
+                }
+
+                function values(){
+                    if(angleValue<0) angleValue = angleValue + 2*Math.PI;
+                    
+                    angleText.setText("Angle = " + angleValue*180/Math.PI);
+                    sinText.setText("sin\u03B8 = " + Math.sin(angleValue));
+                    cosText.setText("cos\u03B8 = " + Math.cos(angleValue));
+                    tanText.setText("tan\u03B8 = " + Math.tan(angleValue));
+                    cscText.setText("csc\u03B8 = " + (1/Math.sin(angleValue)));
+                    secText.setText("sec\u03B8 = " + (1/Math.cos(angleValue)));
+                    cotText.setText("cot\u03B8 = " + (1/Math.tan(angleValue)));
+                }
+
+                function drawIdentities(){
+                    var tangentSlope = -1/((leadingAngle.getEndY()-leadingAngle.getY())/(leadingAngle.getEndX()-leadingAngle.getX()));
+                    var tangentXInt = ((unitCircle.getY()-leadingAngle.getEndY())/tangentSlope) + leadingAngle.getEndX();
+                    var tangentYInt = ((unitCircle.getX()-leadingAngle.getEndX())*tangentSlope) + leadingAngle.getEndY();
+                    
+                    sinTheta.setPosition(cos,unitCircle.getY());
+                    sinTheta.setEndpoint(cos,sin);
+                    cosTheta.setPosition(unitCircle.getX(),sin);
+                    cosTheta.setEndpoint(cos,sin);
+                    secTheta.setPosition(unitCircle.getX(),unitCircle.getY());
+                    secTheta.setEndpoint(tangentXInt,unitCircle.getY());
+                    cscTheta.setPosition(unitCircle.getX(),unitCircle.getY());
+                    cscTheta.setEndpoint(unitCircle.getX(),tangentYInt);
+                    tanTheta.setPosition(cos,sin);
+                    tanTheta.setEndpoint(tangentXInt,unitCircle.getY());
+                    cotTheta.setPosition(cos,sin);
+                    cotTheta.setEndpoint(unitCircle.getX(),tangentYInt);
+                }
+
+                if (typeof start === 'function') {
+                    start();
+                }
+            };
+        </script>
+
+    </body>
+</html>
