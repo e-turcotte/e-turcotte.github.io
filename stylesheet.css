@@ -1,18 +1,50 @@
 h1{
-    color: fuchsia;
+    color: ghostwhite;
 }
 
 .center-square{
-    width: 50vw;
-    height: 50vw;
+    width: 600px;
+    height: 500px;
     margin: auto;
-    padding 25vw;
+    padding: 25px;
     font-size: auto;
+}
+
+#loremipsum{
+    background-image: url('https://i.pinimg.com/736x/95/38/e0/9538e0666a3dee3f559c85e107d43aa2.jpg');
+    background-color: dimgrey;
+    background-blend-mode: multiply;
+}
+
+a{
+    color: blanchedalmond;
+}
+
+a:hover{
+    animation: hue-shifter 1s linear infinite;
 }
 
 #rotate{
     text-align: center;
+    width: 400px;
+    margin: auto;
+    color: fuchsia;
+    font-size: 20px;
     animation: rotator 3s linear infinite;
+}
+
+@keyframes hue-shifter{
+    0%   {color: red; font-size: 100px;}
+    10%  {color: coral; font-size: 120px;}
+    20%  {color: orange; font-size: 140px;}
+    30%  {color: yellow; font-size: 140px;}
+    40%  {color: chartreuse; font-size: 120px;}
+    50%  {color: green; font-size: 100px;}
+    60%  {color: blue; font-size: 80px;}
+    70%  {color: lightblue; font-size: 60px;}
+    80%  {color: fuchsia; font-size: 60px;}
+    90%  {color: purple; font-size: 80px;}
+    100% {color: red; font-size: 100px;}
 }
 
 @keyframes rotator{
