@@ -1,0 +1,22 @@
+h1{
+    color: fuchsia;
+}
+
+.center-square{
+    width: 50vw;
+    height: 50vw;
+    margin: auto;
+    padding 25vw;
+    font-size: auto;
+}
+
+#rotate{
+    text-align: center;
+    animation: rotator 3s linear infinite;
+}
+
+@keyframes rotator{
+    from {rotate: 0deg;}
+    to {rotate: 360deg;}
+}
+    
